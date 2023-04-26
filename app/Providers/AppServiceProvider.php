@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\Contracts\ImportContract;
+use App\Services\DataImportService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +15,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(ImportContract::class, function () {
+            return new DataImportService(config('services.randomuser.base_url'));
+        });
     }
 
     /**

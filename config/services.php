@@ -30,4 +30,7 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'randomuser' => [
+        'base_url' => env('USER_API_BASE_URL') 
+    ]
 ];
