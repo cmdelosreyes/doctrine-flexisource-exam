@@ -6,6 +6,7 @@ use App\Services\Contracts\ImportContract;
 use App\Services\DataImportService;
 use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
 use Illuminate\Support\Facades\Http;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 use Tests\Traits\DoctrineDatabaseMigrations;
 
@@ -62,11 +63,19 @@ class DataImportServiceTest extends TestCase
 
         Http::fake(fn () => Http::response(['results' => [$response]], 200));
 
-        $this->app->bind(ImportContract::class, function () {
-            return new DataImportService('not a real url');
-        });
-
         $this->expectException(NotNullConstraintViolationException::class);
+
+        $this->service->importFromApi();
+
+        $this->assertDatabaseEmpty('customers');
+    }
+
+    /** @test */
+    public function should_not_be_able_to_create_customer_from_api_when_response_is_not_ok()
+    {
+        Http::fake(fn () => Http::response(null, 404));
+
+        $this->expectException(HttpException::class);
 
         $this->service->importFromApi();
 
